@@ -1,0 +1,102 @@
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
+import { CreateAlbumDto } from './dto/create-album.dto';
+import { UpdateAlbumDto } from './dto/update-album.dto';
+import { Album } from './entities/album.entity';
+import { TrackService } from '../track/track.service';
+import { FavoritesService } from '../favorites/favorites.service';
+import { DatabaseService } from 'src/database/database.service';
+
+@Injectable()
+export class AlbumService {
+  // private albums: Album[] = [];
+
+  constructor(
+    // private readonly trackService: TrackService,
+    // private readonly favoritesService: FavoritesService,
+    private readonly database: DatabaseService,
+  ) {}
+
+  findAll(): Album[] {
+    return this.database.albums;
+  }
+
+  findOne(id: string): Album {
+    if (!this.isValidUUID(id)) {
+      throw new BadRequestException('Invalid UUID');
+    }
+
+    const album = this.database.albums.find((a) => a.id === id);
+    if (!album) {
+      throw new NotFoundException('Album not found');
+    }
+
+    return album;
+  }
+
+  create(createAlbumDto: CreateAlbumDto): Album {
+    const newAlbum: Album = {
+      id: uuidv4(),
+      name: createAlbumDto.name,
+      year: createAlbumDto.year,
+      artistId: createAlbumDto.artistId || null,
+    };
+
+    this.database.albums.push(newAlbum);
+    return newAlbum;
+  }
+
+  update(id: string, updateAlbumDto: UpdateAlbumDto): Album {
+    if (!this.isValidUUID(id)) {
+      throw new BadRequestException('Invalid UUID');
+    }
+
+    const albumIndex = this.database.albums.findIndex((a) => a.id === id);
+    if (albumIndex === -1) {
+      throw new NotFoundException('Album not found');
+    }
+
+    const updatedAlbum: Album = {
+      ...this.database.albums[albumIndex],
+      ...updateAlbumDto,
+    };
+
+    this.database.albums[albumIndex] = updatedAlbum;
+    return updatedAlbum;
+  }
+
+  remove(id: string): void {
+    if (!this.isValidUUID(id)) {
+      throw new BadRequestException('Invalid UUID');
+    }
+
+    const albumIndex = this.database.albums.findIndex((a) => a.id === id);
+    if (albumIndex === -1) {
+      throw new NotFoundException('Album not found');
+    }
+
+    // this.favoritesService.removeAlbum(id);
+    // this.trackService.removeAlbumId(id);
+    this.database.removeAlbumId(id);
+    this.database.albums.splice(albumIndex, 1);
+  }
+
+  // removeArtistId(artistId: string): void {
+  //   this.database.albums = this.database.albums.map((album) => {
+  //     if (album.artistId === artistId) {
+  //       return { ...album, artistId: null };
+  //     }
+  //     return album;
+  //   });
+  // }
+
+  private isValidUUID(id: string): boolean {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(id);
+  }
+}
