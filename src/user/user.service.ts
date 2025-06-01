@@ -4,7 +4,7 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 import { User } from './entities/user.entity';
@@ -39,7 +39,7 @@ export class UserService {
 
   create(createUserDto: CreateUserDto): User {
     const newUser: User = {
-      id: uuidv4(),
+      id: randomUUID(),
       login: createUserDto.login,
       password: createUserDto.password,
       version: 1,

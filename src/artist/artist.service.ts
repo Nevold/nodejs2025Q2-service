@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
@@ -32,7 +32,7 @@ export class ArtistService {
 
   create(createArtistDto: CreateArtistDto): Artist {
     const newArtist: Artist = {
-      id: uuidv4(),
+      id: randomUUID(),
       name: createArtistDto.name,
       grammy: createArtistDto.grammy,
     };

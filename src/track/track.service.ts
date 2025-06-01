@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
@@ -32,7 +32,7 @@ export class TrackService {
 
   create(createTrackDto: CreateTrackDto): Track {
     const newTrack: Track = {
-      id: uuidv4(),
+      id: randomUUID(),
       name: createTrackDto.name,
       artistId: createTrackDto.artistId || null,
       albumId: createTrackDto.albumId || null,
