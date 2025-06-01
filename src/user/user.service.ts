@@ -16,8 +16,9 @@ export class UserService {
 
   findAll(): Omit<User, 'password'>[] {
     return this.database.users.map((user) => {
-      const { password, ...userWithoutPassword } = user;
-      return userWithoutPassword;
+      return Object.fromEntries(
+        Object.entries(user).filter(([key]) => key !== 'password'),
+      ) as User;
     });
   }
 
@@ -31,8 +32,9 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    const { password, ...userWithoutPassword } = user;
-    return userWithoutPassword as User;
+    return Object.fromEntries(
+      Object.entries(user).filter(([key]) => key !== 'password'),
+    ) as User;
   }
 
   create(createUserDto: CreateUserDto): User {
@@ -47,8 +49,9 @@ export class UserService {
 
     this.database.users.push(newUser);
 
-    const { password, ...userWithoutPassword } = newUser;
-    return userWithoutPassword as User;
+    return Object.fromEntries(
+      Object.entries(newUser).filter(([key]) => key !== 'password'),
+    ) as User;
   }
 
   updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): User {
@@ -75,8 +78,9 @@ export class UserService {
 
     this.database.users[userIndex] = updatedUser;
 
-    const { password, ...userWithoutPassword } = updatedUser;
-    return userWithoutPassword as User;
+    return Object.fromEntries(
+      Object.entries(updatedUser).filter(([key]) => key !== 'password'),
+    ) as User;
   }
 
   remove(id: string): void {
