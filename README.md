@@ -70,3 +70,69 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+### Use
+
+1. For `Users`, `Artists`, `Albums`, `Tracks` and `Favorites` REST endpoints
+
+- `Users` (`/user` route)
+
+  - `GET /user` - get all users
+  - `GET /user/:id` - get single user by id
+  - `POST /user` - create user (following DTO should be used)
+    `CreateUserDto`
+    ```typescript
+    interface CreateUserDto {
+      login: string;
+      password: string;
+    }
+    ```
+  - `PUT /user/:id` - update user's password
+    `UpdatePasswordDto` (with attributes):
+    ```typescript
+    interface UpdatePasswordDto {
+      oldPassword: string;
+      newPassword: string;
+    }
+    ```
+  - `DELETE /user/:id` - delete user
+
+- `Tracks` (`/track` route)
+
+  - `GET /track` - get all tracks
+  - `GET /track/:id` - get single track by id
+  - `POST /track` - create new track
+  - `PUT /track/:id` - update track info
+  - `DELETE /track/:id` - delete track
+
+- `Artists` (`/artist` route)
+
+  - `GET /artist` - get all artists
+  - `GET /artist/:id` - get single artist by id
+  - `POST /artist` - create new artist
+  - `PUT /artist/:id` - update artist info
+  - `DELETE /artist/:id` - delete album
+
+- `Albums` (`/album` route)
+
+  - `GET /album` - get all albums
+  - `GET /album/:id` - get single album by id
+  - `POST /album` - create new album
+  - `PUT /album/:id` - update album info
+  - `DELETE /album/:id` - delete album
+
+- `Favorites`
+  - `GET /favs` - get all favorites
+    ```typescript
+    interface FavoritesResponse {
+      artists: Artist[];
+      albums: Album[];
+      tracks: Track[];
+    }
+    ```
+  - `POST /favs/track/:id` - add track to the favorites
+  - `DELETE /favs/track/:id` - delete track from favorites
+  - `POST /favs/album/:id` - add album to the favorites
+  - `DELETE /favs/album/:id` - delete album from favorites
+  - `POST /favs/artist/:id` - add artist to the favorites
+  - `DELETE /favs/artist/:id` - delete artist from favorites
