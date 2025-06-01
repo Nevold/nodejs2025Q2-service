@@ -7,22 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
-import { TrackService } from '../track/track.service';
-import { AlbumService } from '../album/album.service';
-import { FavoritesService } from '../favorites/favorites.service';
 import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class ArtistService {
-  // private artists: Artist[] = [];
-
-  constructor(
-    // private readonly trackService: TrackService,
-    // private readonly favoritesService: FavoritesService,
-    // private readonly albumService: AlbumService,
-    private readonly database: DatabaseService,
-  ) {}
-  // constructor(private readonly database: DatabaseService) {}
+  constructor(private readonly database: DatabaseService) {}
 
   findAll(): Artist[] {
     return this.database.artists;
@@ -81,9 +70,6 @@ export class ArtistService {
       throw new NotFoundException('Artist not found');
     }
 
-    // this.favoritesService.removeArtist(id);
-    // this.trackService.removeArtistId(id);
-    // this.albumService.removeArtistId(id);
     this.database.removeArtistId(id);
 
     this.database.artists.splice(artistIndex, 1);

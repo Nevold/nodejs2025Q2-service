@@ -1,34 +1,14 @@
-import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
-// import { ArtistService } from '../artist/artist.service';
-// import { AlbumService } from '../album/album.service';
-// import { TrackService } from '../track/track.service';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Favorites } from './entities/favorites.entity';
 import { DatabaseService } from 'src/database/database.service';
-import { Artist } from 'src/artist/entities/artist.entity';
-import { Album } from 'src/album/entities/album.entity';
-import { Track } from 'src/track/entities/track.entity';
-import { argv } from 'process';
 
 @Injectable()
 export class FavoritesService {
-  // private favorites = {
-  //   artists: [],
-  //   albums: [],
-  //   tracks: [],
-  // };
-
-  // constructor(
-  //   @Inject(ArtistService) private readonly artistService: ArtistService,
-  //   @Inject(AlbumService) private readonly albumService: AlbumService,
-  //   @Inject(TrackService) private readonly trackService: TrackService,
-  // ) {}
   constructor(private readonly database: DatabaseService) {}
 
   findAll(): Favorites {
-    const favoriteArtists = this.database.artists.filter(
-      (artist) =>
-        this.database.favorites.artists.some((ar) => ar.id === artist.id),
-      // this.database.favorites.artists[index].id === artist.id,
+    const favoriteArtists = this.database.artists.filter((artist) =>
+      this.database.favorites.artists.some((ar) => ar.id === artist.id),
     );
 
     const favoriteAlbums = this.database.albums.filter((album) =>
@@ -45,13 +25,6 @@ export class FavoritesService {
       tracks: favoriteTracks,
     };
   }
-  // findAll(): Favorites {
-  //   return {
-  //     artists: this.database.favorites.artists,
-  //     albums: this.database.favorites.albums,
-  //     tracks: this.database.favorites.tracks,
-  //   };
-  // }
 
   addTrack(id: string) {
     this.validateId(id);

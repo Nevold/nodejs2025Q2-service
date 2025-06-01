@@ -7,14 +7,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
-// import { FavoritesService } from '../favorites/favorites.service';
 import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class TrackService {
-  // private tracks: Track[] = [];
-
-  // constructor(private readonly favoritesService: FavoritesService) {}
   constructor(private readonly database: DatabaseService) {}
 
   findAll(): Track[] {
@@ -76,19 +72,8 @@ export class TrackService {
       throw new NotFoundException('Track not found');
     }
 
-    // this.favoritesService.removeTrack(id);
-
     this.database.tracks.splice(trackIndex, 1);
   }
-
-  // removeArtistId(artistId: string): void {
-  //   this.database.tracks = this.database.tracks.map((track) => {
-  //     if (track.artistId === artistId) {
-  //       return { ...track, artistId: null };
-  //     }
-  //     return track;
-  //   });
-  // }
 
   removeAlbumId(albumId: string): void {
     this.database.tracks = this.database.tracks.map((track) => {

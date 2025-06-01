@@ -7,19 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
-import { TrackService } from '../track/track.service';
-import { FavoritesService } from '../favorites/favorites.service';
 import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class AlbumService {
-  // private albums: Album[] = [];
-
-  constructor(
-    // private readonly trackService: TrackService,
-    // private readonly favoritesService: FavoritesService,
-    private readonly database: DatabaseService,
-  ) {}
+  constructor(private readonly database: DatabaseService) {}
 
   findAll(): Album[] {
     return this.database.albums;
@@ -79,20 +71,9 @@ export class AlbumService {
       throw new NotFoundException('Album not found');
     }
 
-    // this.favoritesService.removeAlbum(id);
-    // this.trackService.removeAlbumId(id);
     this.database.removeAlbumId(id);
     this.database.albums.splice(albumIndex, 1);
   }
-
-  // removeArtistId(artistId: string): void {
-  //   this.database.albums = this.database.albums.map((album) => {
-  //     if (album.artistId === artistId) {
-  //       return { ...album, artistId: null };
-  //     }
-  //     return album;
-  //   });
-  // }
 
   private isValidUUID(id: string): boolean {
     const uuidRegex =
