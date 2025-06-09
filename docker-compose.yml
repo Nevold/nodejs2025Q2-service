@@ -1,0 +1,62 @@
+networks:
+  library-network:
+    driver: bridge
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.postgres
+    container_name: library_db
+    env_file: .env
+    ports:
+      - '${DB_PORT}:${DB_PORT}'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_logs:/var/log/postgresql
+    networks:
+      - library-network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME} -d ${DB_NAME}']
+      interval: ${HEALTHCHECK_INTERVAL:-5s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-5s}
+      retries: ${HEALTHCHECK_RETRIES:-5}
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: library_app
+    env_file: .env
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /usr/src/app/src
+        - action: rebuild
+          path: package.json
+          target: /usr/src/app/package.json
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    volumes:
+      - type: bind
+        source: ./src
+        target: /usr/src/app/src
+        consistency: cached
+      - ./src:/usr/src/app/src
+      - ./nest-cli.json:/usr/src/app/nest-cli.json
+      - ./nodemon.json:/usr/src/app/nodemon.json
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - library-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  postgres_logs:
