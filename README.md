@@ -136,3 +136,11 @@ For more information, visit: https://code.visualstudio.com/docs/editor/debugging
   - `DELETE /favs/album/:id` - delete album from favorites
   - `POST /favs/artist/:id` - add artist to the favorites
   - `DELETE /favs/artist/:id` - delete artist from favorites
+
+## Running application with Docker
+
+Downloading: <kbd>git clone {repository URL}</kbd>
+
+Installing NPM modules: <kbd>npm ci</kbd>
+
+Running application: <kbd>npm run docker:up</kbd> <kbd>docker-compose up </kbd> or <kbd>docker-compose up --build</kbd>
