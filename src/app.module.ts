@@ -15,7 +15,6 @@ import {
   FavoriteArtist,
   FavoriteTrack,
 } from './favorites/entities/favorites.entity';
-import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -35,7 +34,7 @@ import { AppController } from './app.controller';
         FavoriteAlbum,
         FavoriteTrack,
       ],
-      synchronize: true,
+      synchronize: false,
       logging: true,
       migrationsRun: true,
       extra: {
@@ -59,9 +58,5 @@ import { AppController } from './app.controller';
     TrackModule,
     FavoritesModule,
   ],
-  controllers: [AppController],
 })
 export class AppModule {}
-
-// docker system prune -a --volumes --force
-// docker builder prune --all --force
