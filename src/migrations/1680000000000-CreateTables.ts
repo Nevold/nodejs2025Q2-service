@@ -294,18 +294,6 @@ export class CreateTables1680000000000 implements MigrationInterface {
         onDelete: 'CASCADE',
       }),
     );
-
-    //     await queryRunner.query(`
-    //   INSERT INTO users (id, login, password, version, createdAt, updatedAt)
-    //   VALUES (
-    //     'aad4f4a1-3a3d-4b8e-8f1a-6b3f4d2e1c7a',
-    //     'testuser',
-    //     '$2a$10$N9qo8uLOickgx2ZMRZoMy.MQRjQphJ1G2pQ6d.Yw7X8U6c3l0Jq6G',
-    //     1,
-    //     ${Date.now()},
-    //     ${Date.now()}
-    //   )
-    // `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
