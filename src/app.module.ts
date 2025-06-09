@@ -34,7 +34,7 @@ import {
         FavoriteAlbum,
         FavoriteTrack,
       ],
-      synchronize: false,
+      synchronize: true,
       logging: true,
       migrationsRun: true,
       extra: {
