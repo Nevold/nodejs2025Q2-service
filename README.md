@@ -12,7 +12,7 @@ git clone {repository URL}
 npm ci
 ```
 
-## Running application
+## Running application (more preferable option)
 
 ```
 npm run start
