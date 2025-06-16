@@ -15,49 +15,54 @@ import {
   FavoriteArtist,
   FavoriteTrack,
 } from './favorites/entities/favorites.entity';
-import { LoggingService } from './logging/logging.service';
-import { LoggingInterceptor } from './logging/logging.interceptor';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { JwtModule } from './jwt/jwt.module';
 import { LoggingModule } from './logging/logging.module';
+
+const isDocker = process.env.RUN_IN_DOCKER === 'true';
+
+const typeOrmImports = isDocker
+  ? [
+      TypeOrmModule.forRoot({
+        type: 'postgres',
+        host: process.env.DB_HOST,
+        port: parseInt(process.env.DB_PORT),
+        username: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        entities: [
+          UserEntity,
+          ArtistEntity,
+          AlbumEntity,
+          TrackEntity,
+          FavoriteArtist,
+          FavoriteAlbum,
+          FavoriteTrack,
+        ],
+        synchronize: true,
+        logging: false,
+        migrationsRun: true,
+        extra: {
+          poolSize: 10,
+          connectionTimeoutMillis: 5000,
+        },
+      }),
+      TypeOrmModule.forFeature([
+        UserEntity,
+        ArtistEntity,
+        AlbumEntity,
+        TrackEntity,
+        FavoriteArtist,
+        FavoriteAlbum,
+        FavoriteTrack,
+      ]),
+    ]
+  : [];
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    // TypeOrmModule.forRoot({
-    //   type: 'postgres',
-    //   host: process.env.DB_HOST,
-    //   port: parseInt(process.env.DB_PORT),
-    //   username: process.env.DB_USERNAME,
-    //   password: process.env.DB_PASSWORD,
-    //   database: process.env.DB_NAME,
-    //   entities: [
-    //     UserEntity,
-    //     ArtistEntity,
-    //     AlbumEntity,
-    //     TrackEntity,
-    //     FavoriteArtist,
-    //     FavoriteAlbum,
-    //     FavoriteTrack,
-    //   ],
-    //   synchronize: true,
-    //   logging: false,
-    //   migrationsRun: true,
-    //   extra: {
-    //     poolSize: 10,
-    //     connectionTimeoutMillis: 5000,
-    //   },
-    // }),
-    // TypeOrmModule.forFeature([
-    //   UserEntity,
-    //   ArtistEntity,
-    //   AlbumEntity,
-    //   TrackEntity,
-    //   FavoriteArtist,
-    //   FavoriteAlbum,
-    //   FavoriteTrack,
-    // ]),
+    ...typeOrmImports,
     DatabaseModule,
     UserModule,
     ArtistModule,
@@ -67,7 +72,5 @@ import { LoggingModule } from './logging/logging.module';
     AuthModule,
     LoggingModule,
   ],
-  // providers: [LoggingService, LoggingInterceptor],
-  // exports: [LoggingService, LoggingInterceptor],
 })
 export class AppModule {}
