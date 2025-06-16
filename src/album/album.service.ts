@@ -8,71 +8,125 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { Album } from './entities/album.entity';
 import { DatabaseService } from 'src/database/database.service';
+import { LoggingService } from '../logging/logging.service';
 
 @Injectable()
 export class AlbumService {
-  constructor(private readonly database: DatabaseService) {}
+  constructor(
+    private readonly database: DatabaseService,
+    private readonly loggingService: LoggingService,
+  ) {}
 
-  findAll(): Album[] {
-    return this.database.albums;
+  async findAll(): Promise<Album[]> {
+    try {
+      const albums = this.database.albums;
+      await this.loggingService.log(`Retrieved ${albums.length} albums`);
+      return albums;
+    } catch (error) {
+      await this.loggingService.error(
+        `Failed to fetch albums: ${error.message}`,
+      );
+      throw error;
+    }
   }
 
-  findOne(id: string): Album {
-    if (!this.isValidUUID(id)) {
-      throw new BadRequestException('Invalid UUID');
-    }
+  async findOne(id: string): Promise<Album> {
+    try {
+      if (!this.isValidUUID(id)) {
+        await this.loggingService.warn(`Invalid UUID format: ${id}`);
+        throw new BadRequestException('Invalid UUID');
+      }
 
-    const album = this.database.albums.find((a) => a.id === id);
-    if (!album) {
-      throw new NotFoundException('Album not found');
-    }
+      const album = this.database.albums.find((a) => a.id === id);
+      if (!album) {
+        await this.loggingService.warn(`Album not found with ID: ${id}`);
+        throw new NotFoundException('Album not found');
+      }
 
-    return album;
+      await this.loggingService.log(`Retrieved album with ID: ${id}`);
+      return album;
+    } catch (error) {
+      await this.loggingService.error(
+        `Failed to fetch album ${id}: ${error.message}`,
+      );
+      throw error;
+    }
   }
 
-  create(createAlbumDto: CreateAlbumDto): Album {
-    const newAlbum: Album = {
-      id: randomUUID(),
-      name: createAlbumDto.name,
-      year: createAlbumDto.year,
-      artistId: createAlbumDto.artistId || null,
-    };
+  async create(createAlbumDto: CreateAlbumDto): Promise<Album> {
+    try {
+      const newAlbum: Album = {
+        id: randomUUID(),
+        name: createAlbumDto.name,
+        year: createAlbumDto.year,
+        artistId: createAlbumDto.artistId || null,
+      };
 
-    this.database.albums.push(newAlbum);
-    return newAlbum;
+      this.database.albums.push(newAlbum);
+      await this.loggingService.log(
+        `Created new album with ID: ${newAlbum.id}, name: ${newAlbum.name}`,
+      );
+      return newAlbum;
+    } catch (error) {
+      await this.loggingService.error(
+        `Failed to create album: ${error.message}`,
+      );
+      throw error;
+    }
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto): Album {
-    if (!this.isValidUUID(id)) {
-      throw new BadRequestException('Invalid UUID');
+  async update(id: string, updateAlbumDto: UpdateAlbumDto): Promise<Album> {
+    try {
+      if (!this.isValidUUID(id)) {
+        await this.loggingService.warn(`Invalid UUID format: ${id}`);
+        throw new BadRequestException('Invalid UUID');
+      }
+
+      const albumIndex = this.database.albums.findIndex((a) => a.id === id);
+      if (albumIndex === -1) {
+        await this.loggingService.warn(`Album not found with ID: ${id}`);
+        throw new NotFoundException('Album not found');
+      }
+
+      const updatedAlbum: Album = {
+        ...this.database.albums[albumIndex],
+        ...updateAlbumDto,
+      };
+
+      this.database.albums[albumIndex] = updatedAlbum;
+      await this.loggingService.log(`Updated album with ID: ${id}`);
+
+      return updatedAlbum;
+    } catch (error) {
+      await this.loggingService.error(
+        `Failed to update album ${id}: ${error.message}`,
+      );
+      throw error;
     }
-
-    const albumIndex = this.database.albums.findIndex((a) => a.id === id);
-    if (albumIndex === -1) {
-      throw new NotFoundException('Album not found');
-    }
-
-    const updatedAlbum: Album = {
-      ...this.database.albums[albumIndex],
-      ...updateAlbumDto,
-    };
-
-    this.database.albums[albumIndex] = updatedAlbum;
-    return updatedAlbum;
   }
 
-  remove(id: string): void {
-    if (!this.isValidUUID(id)) {
-      throw new BadRequestException('Invalid UUID');
-    }
+  async remove(id: string): Promise<void> {
+    try {
+      if (!this.isValidUUID(id)) {
+        await this.loggingService.warn(`Invalid UUID format: ${id}`);
+        throw new BadRequestException('Invalid UUID');
+      }
 
-    const albumIndex = this.database.albums.findIndex((a) => a.id === id);
-    if (albumIndex === -1) {
-      throw new NotFoundException('Album not found');
-    }
+      const albumIndex = this.database.albums.findIndex((a) => a.id === id);
+      if (albumIndex === -1) {
+        await this.loggingService.warn(`Album not found with ID: ${id}`);
+        throw new NotFoundException('Album not found');
+      }
 
-    this.database.removeAlbumId(id);
-    this.database.albums.splice(albumIndex, 1);
+      this.database.removeAlbumId(id);
+      this.database.albums.splice(albumIndex, 1);
+      await this.loggingService.log(`Deleted album with ID: ${id}`);
+    } catch (error) {
+      await this.loggingService.error(
+        `Failed to delete album ${id}: ${error.message}`,
+      );
+      throw error;
+    }
   }
 
   private isValidUUID(id: string): boolean {

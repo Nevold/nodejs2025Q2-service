@@ -12,34 +12,48 @@ import {
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
+import { LoggingService } from '../logging/logging.service';
 
 @Controller('artist')
 export class ArtistController {
-  constructor(private readonly artistService: ArtistService) {}
+  constructor(
+    private readonly artistService: ArtistService,
+    private readonly loggingService: LoggingService,
+  ) {}
 
   @Get()
-  findAll() {
+  async findAll() {
+    await this.loggingService.log('Starting to fetch all artists');
     return this.artistService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
+    await this.loggingService.log(`Starting to fetch artist with ID: ${id}`);
     return this.artistService.findOne(id);
   }
 
   @Post()
-  create(@Body() createArtistDto: CreateArtistDto) {
+  async create(@Body() createArtistDto: CreateArtistDto) {
+    await this.loggingService.log(
+      `Starting to create artist with name: ${createArtistDto.name}`,
+    );
     return this.artistService.create(createArtistDto);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateArtistDto: UpdateArtistDto,
+  ) {
+    await this.loggingService.log(`Starting to update artist with ID: ${id}`);
     return this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
+    await this.loggingService.log(`Starting to delete artist with ID: ${id}`);
     return this.artistService.remove(id);
   }
 }
