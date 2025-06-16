@@ -1,6 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { sign, verify } from 'jsonwebtoken';
+import {
+  sign,
+  verify,
+  TokenExpiredError,
+  JsonWebTokenError,
+} from 'jsonwebtoken';
 import { LoggingService } from '../logging/logging.service';
 
 @Injectable()
@@ -81,6 +86,13 @@ export class JwtService {
       this.loggingService.warn(
         `Refresh token verification failed: ${error.message}`,
       );
+
+      if (
+        error instanceof TokenExpiredError ||
+        error instanceof JsonWebTokenError
+      ) {
+        throw new ForbiddenException('Invalid refresh token');
+      }
       throw error;
     }
   }

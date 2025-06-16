@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
@@ -82,14 +83,14 @@ export class AuthService {
   async refresh(refreshToken: string) {
     try {
       if (!refreshToken) {
-        throw new BadRequestException('Refresh token is required');
+        throw new UnauthorizedException('Refresh token is required');
       }
 
       const payload = this.jwtService.checkRefreshToken(refreshToken);
       const user = await this.userService.findOne(payload.userId);
 
       if (!user) {
-        throw new UnauthorizedException('User not found');
+        throw new ForbiddenException('User not found');
       }
 
       const newAccessToken = this.jwtService.createAccessToken(
