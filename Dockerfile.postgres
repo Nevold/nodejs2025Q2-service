@@ -1,0 +1,10 @@
+FROM postgres:17-alpine
+
+ENV POSTGRES_DB=home_library
+ENV POSTGRES_USER=library_user
+ENV POSTGRES_PASSWORD=library_password
+
+EXPOSE 5432
+
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
